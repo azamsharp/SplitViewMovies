@@ -8,6 +8,17 @@
 import SwiftUI
 import CoreData
 
+extension Movie {
+    
+    static func byGenre(genre: Genre) -> [Movie] {
+        let request = Movie.fetchRequest()
+        request.predicate = NSPredicate(format: "genre = %@", genre)
+        return (try? CoreDataManager.shared.persistentContainer.viewContext.fetch(request)) ?? []
+    }
+    
+}
+
+
 struct MovieListView: View {
     
     @FetchRequest(sortDescriptors: [])
@@ -85,7 +96,9 @@ struct ContentView: View {
         NavigationSplitView {
             GenreListView(selectedGenre: $genre)
         } detail: {
-            MovieListView(movies: moviesByGenre)
+            if let genre {
+                MovieListView(movies: Movie.byGenre(genre: genre))
+            }
         }
 
     }
